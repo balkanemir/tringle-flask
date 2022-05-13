@@ -1,0 +1,35 @@
+version: "3"
+services:
+  python-dev: 
+    container_name: tringle
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/var/app/tringle
+    ports:
+      - "5050:5050"
+
+
+  mysql-dev:
+    platform: linux/x86_64
+    image: mysql:5.7.34
+    container_name: tringle-db
+    ports:
+      - 6603:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+    volumes:
+      - database-folder:/var/lib/mysql
+
+
+  adminer:
+    image: adminer
+    container_name: tringle-adminer
+    restart: always
+    ports:
+      - 8080:8080
+    links:
+      - mysql-dev
+volumes:
+  database-folder:
