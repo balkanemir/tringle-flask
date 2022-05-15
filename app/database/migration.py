@@ -20,30 +20,30 @@ migrate = Migrate(app, db)
 handler = Manager(app)
 handler.add_command('db', MigrateCommand)
 
-class CurrencyCodeEnum(enum.Enum):
+class CurrencyCode(enum.Enum):
     TRY = 'TRY'
     USD = 'USD'
     EUR = 'EUR'
 
-class AccountTypeEnum(enum.Enum):
+class AccountType(enum.Enum):
     individual = 'individual'
     corporate = 'corporate'
 
-class TransactionNameEnum(enum.Enum):
+class TransactionName(enum.Enum):
     payment = 'payment'
     deposit = 'deposit'
     withdraw = 'withdraw'
 
 class Payment(db.Model):
     accountNumber = db.Column(db.Integer, primary_key=True)
-    currencyCode = db.Column(db.Enum(CurrencyCodeEnum))
+    currencyCode = db.Column(db.Enum(CurrencyCode))
     ownerName = db.Column(db.String(128))
-    accountType = db.Column(db.Enum(AccountTypeEnum))
+    accountType = db.Column(db.Enum(AccountType))
     balance = db.Column(db.Integer)
     senderAccount = db.Column(db.Integer)
     receiverAccount = db.Column(db.Integer)
     amount = db.Column(db.Integer)
-    transactionType = db.Column(db.Enum(TransactionNameEnum))
+    transactionType = db.Column(db.Enum(TransactionName))
 
 if __name__ == '__main__':
     handler.run()
