@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_script._compat import text_type
 from flask_script import Manager
+import datetime
 import enum
 
 import sys
@@ -39,11 +40,12 @@ class Payment(db.Model):
     currencyCode = db.Column(db.Enum(CurrencyCode))
     ownerName = db.Column(db.String(128))
     accountType = db.Column(db.Enum(AccountType))
-    balance = db.Column(db.Integer)
+    balance = db.Column(db.Integer, default=0, nullable=False)
     senderAccount = db.Column(db.Integer)
     receiverAccount = db.Column(db.Integer)
     amount = db.Column(db.Integer)
     transactionType = db.Column(db.Enum(TransactionName))
+    createdAt = db.Column(db.Date)
 
 if __name__ == '__main__':
     handler.run()
