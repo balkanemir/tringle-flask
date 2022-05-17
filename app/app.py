@@ -44,10 +44,10 @@ def account_create():
 
 
 
-@app.route('/account/<accountNum>', methods=['GET'])
+@app.route('/account/<accountNumber>', methods=['GET'])
 def account_info(accountNumber):
     try:
-        sql = text('SELECT accountNumber, currencyCode, ownerName, accountType, balance FROM payment WHERE accountNumber=accountNumber')
+        sql = text('SELECT accountNumber, currencyCode, ownerName, accountType, balance FROM payment WHERE accountNumber=:accountNumber')
         result = db.engine.execute(sql, accountNumber=accountNumber).fetchone()
         return json.dumps({"accountNumber": result.accountNumber, "currencyCode": result.currencyCode, "ownerName": result.ownerName, "accountType": result.accountType, "balance": result.balance}), HTTPStatus.OK
     except Exception as e:
@@ -117,3 +117,17 @@ def transaction(accountNumber):
         return json.dumps({"accountNumber": result.accountNumber, "amount": result.amount, "transactionType": result.transactionType, "createdAt": str(result.createdAt)}), HTTPStatus.OK
     except Exception as e:
         return json.dumps('Failed. ' + str(e)), HTTPStatus.NOT_FOUND
+
+
+def create(post_data):
+    sql = text(
+        'INSERT INTO payment (accountNumber, currencyCode, ownerName, accountType, balance ,senderAccount, receiverAccount, amount, transactionType) values (:accountNumber, :currencyCode, :ownerName, :accountType, :balance, NULL, NULL, NULL, NULL)'
+    )
+    return execute(sql, post_data)
+
+
+def execute(sql, data):
+    return db.engine.execute(sql, data)   
+
+def return_message(message):
+    return json.dumps(message), HTTPStatus.OK
