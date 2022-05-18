@@ -112,12 +112,13 @@ def withdraw():
 @app.route('/accounting/<accountNumber>', methods=['GET'])
 def transaction(accountNumber):
     try:
-        sql = text('SELECT accountNumber, amount, transactionType, createdAt FROM payment WHERE accountNumber=accountNumber')
+        sql = text('SELECT accountNumber, amount, transactionType, createdAt FROM payment WHERE accountNumber=:accountNumber')
         result = db.engine.execute(sql, accountNumber=accountNumber).fetchone()
         return json.dumps({"accountNumber": result.accountNumber, "amount": result.amount, "transactionType": result.transactionType, "createdAt": str(result.createdAt)}), HTTPStatus.OK
     except Exception as e:
         return json.dumps('Failed. ' + str(e)), HTTPStatus.NOT_FOUND
 
+# After this line, written functions for tests (see test.py)
 
 def create(post_data):
     sql = text(
@@ -126,8 +127,29 @@ def create(post_data):
     return execute(sql, post_data)
 
 
+def update(post_data):
+    sql = text(
+        'UPDATE payment SET receiverAccount=:receiverAccount,senderAccount=:senderAccount, balance= balance - :amount , amount=:amount, transactionType="payment", createdAt=:createdAt WHERE accountNumber=:senderAccount'
+    ) 
+    result = db.engine.execute(sql, post_data)  
+    sql = text(
+        'UPDATE payment SET receiverAccount=:receiverAccount,senderAccount=:senderAccount, balance= balance + :amount , amount=:amount, transactionType="payment", createdAt=:createdAt WHERE accountNumber=:receiverAccount'
+    )
+    result = db.engine.execute(sql, post_data)  
+    return result
+
+def update_deposit(post_data):
+    sql = text(
+        'UPDATE payment SET receiverAccount=NULL,senderAccount=NULL, balance= balance + :amount , amount=:amount, transactionType="deposit", createdAt=:createdAt WHERE accountNumber=:accountNumber'
+        )
+    return execute(sql, post_data)
+
+def update_withdraw(post_data):
+    sql =  sql = text(
+        'UPDATE payment SET receiverAccount=NULL,senderAccount=NULL, balance= balance - :amount , amount=:amount, transactionType="withdraw", createdAt=:createdAt WHERE accountNumber=:accountNumber' 
+    )
+    return execute(sql, post_data)
+    
+
 def execute(sql, data):
     return db.engine.execute(sql, data)   
-
-def return_message(message):
-    return json.dumps(message), HTTPStatus.OK
